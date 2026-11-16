@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Big Boss House</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+
+    <!-- BACKGROUND EFFECTS -->
+
+    <div class="background-glow glow-one"></div>
+    <div class="background-glow glow-two"></div>
+
+
+    <!-- MAIN CARD -->
+
+    <main class="game-container">
+
+
+        <div class="brand">
+
+            <span class="brand-icon">👁️</span>
+
+            <span>BIG BOSS</span>
+
+        </div>
+
+
+        <h1>
+            THE HOUSE
+        </h1>
+
+
+        <p class="tagline">
+            Enter the house. Face the challenges.
+        </p>
+
+
+        <div class="divider"></div>
+
+
+        <p class="welcome-text">
+            Welcome, contestant.
+            Your journey begins here.
+        </p>
+
+
+        <!-- PLAYER NAME -->
+
+        <div class="input-box">
+
+            <label for="playerName">
+                CONTESTANT NAME
+            </label>
+
+            <input
+                type="text"
+                id="playerName"
+                placeholder="Enter your name"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <!-- ENTER BUTTON -->
+
+        <button
+            class="main-button"
+            onclick="enterHouse()"
+        >
+
+            ENTER THE HOUSE
+
+            <span>→</span>
+
+        </button>
+
+
+        <p id="message"></p>
+
+
+        <div class="footer-text">
+            BIG BOSS HOUSE • SEASON 01
+        </div>
+
+
+    </main>
+
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

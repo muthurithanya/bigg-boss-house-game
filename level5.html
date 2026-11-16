@@ -1,0 +1,356 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bigg Boss | Grand Finale</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;min-height:100vh;padding:25px 15px;
+  font-family:Arial,sans-serif;text-align:center;color:white;
+  background:radial-gradient(circle at top,#702c91,#180d2d 65%,#080511);
+}
+.container{
+  width:100%;max-width:800px;margin:20px auto;padding:28px 20px;
+  background:rgba(255,255,255,.09);border:1px solid #d9a5ff;
+  border-radius:22px;box-shadow:0 0 28px #a64dff55;
+}
+h1{color:#ffd66b;text-shadow:0 0 15px #ffb700}
+h2{color:#f5c8ff}
+button{
+  border:0;border-radius:12px;padding:13px 20px;margin:7px;
+  font-size:16px;font-weight:bold;cursor:pointer;
+  background:linear-gradient(135deg,#ffcf5a,#ff8bba);color:#24102e;
+}
+button:disabled{opacity:.45;cursor:not-allowed}
+.option{
+  display:block;width:100%;max-width:550px;margin:12px auto;
+  background:#fff;color:#251238;text-align:left;
+}
+.option:hover{transform:scale(1.02)}
+.option.correct{background:#3bd68b;color:#062c1a}
+.option.wrong{background:#ff647b;color:#35000a}
+.hidden{display:none!important}
+.scoreboard{
+  display:flex;justify-content:space-around;gap:12px;flex-wrap:wrap;
+  margin:20px 0;
+}
+.score{
+  flex:1;min-width:130px;padding:15px;border-radius:14px;
+  background:#ffffff18;border:1px solid #ffffff55;
+}
+.score strong{display:block;font-size:28px;color:#ffd66b;margin-top:8px}
+#feedback{min-height:30px;font-weight:bold;color:#ffe58a}
+#celebration{
+  position:relative;overflow:hidden;
+  background:linear-gradient(145deg,#3c145c,#17102e);
+}
+.trophy{font-size:90px;animation:bounce 1s infinite alternate}
+.winner{font-size:34px;color:#ffe36d;text-shadow:0 0 18px gold}
+.confetti{
+  position:absolute;top:-30px;font-size:25px;
+  animation:fall 4s linear infinite;
+}
+@keyframes bounce{to{transform:translateY(-15px) rotate(5deg)}}
+@keyframes fall{to{transform:translateY(900px) rotate(720deg)}}
+.small{color:#e5d5f5;font-size:14px}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="intro">
+  <h1>👑 BIGG BOSS 👑</h1>
+  <h2>THE GRAND FINALE</h2>
+  <p>One final battle. One ultimate champion.</p>
+  <p>🔥 HUMAN vs ROBO-X 🤖</p>
+  <p class="small">10 random questions • 100 points for every correct answer</p>
+  <button onclick="startGame()">START GRAND FINALE</button>
+</div>
+
+<div class="container hidden" id="game">
+  <h1>🏆 GRAND FINALE ARENA 🏆</h1>
+  <div class="scoreboard">
+    <div class="score">👤 <span id="humanName">CONTESTANT</span><strong id="humanScore">0</strong></div>
+    <div class="score">🤖 ROBO-X<strong id="robotScore">0</strong></div>
+  </div>
+  <p id="questionCount">QUESTION 1 / 10</p>
+  <h2 id="question">Question appears here</h2>
+  <div id="options"></div>
+  <p id="feedback"></p>
+  <p id="robotStatus" class="small"></p>
+  <button id="nextBtn" class="hidden" onclick="nextQuestion()">NEXT QUESTION ➜</button>
+</div>
+
+<div class="container hidden" id="celebration">
+  <div id="confettiArea"></div>
+  <h1>🎊 THE GRAND CELEBRATION 🎊</h1>
+  <div class="trophy">🏆</div>
+  <h2 id="winnerTitle" class="winner">CHAMPION!</h2>
+  <h2 id="winnerName"></h2>
+  <p id="winnerMessage"></p>
+  <div class="scoreboard">
+    <div class="score">👤 HUMAN<strong id="finalHuman">0</strong></div>
+    <div class="score">🤖 ROBO-X<strong id="finalRobot">0</strong></div>
+  </div>
+  <h2>🌟 SEASON FINALE COMPLETED 🌟</h2>
+  <p>What an amazing battle! Congratulations to the champion!</p>
+  <button onclick="goHome()">BACK TO HOME</button>
+</div>
+
+<script>
+const questions = [
+ {q:"Which is the largest planet in our Solar System?",a:["Earth","Jupiter","Mars","Venus"],c:1},
+ {q:"What is the capital of Japan?",a:["Seoul","Beijing","Tokyo","Bangkok"],c:2},
+ {q:"How many colours are there in a rainbow?",a:["Five","Six","Seven","Eight"],c:2},
+ {q:"Which gas do plants absorb?",a:["Oxygen","Carbon dioxide","Nitrogen","Hydrogen"],c:1},
+ {q:"Who wrote the national anthem of India?",a:["Rabindranath Tagore","Mahatma Gandhi","Subramania Bharati","Bankim Chandra"],c:0},
+ {q:"Which is the fastest land animal?",a:["Lion","Cheetah","Horse","Tiger"],c:1},
+ {q:"What is the currency of the United Kingdom?",a:["Euro","Dollar","Pound sterling","Yen"],c:2},
+ {q:"Which organ pumps blood around the body?",a:["Lungs","Brain","Heart","Kidney"],c:2},
+ {q:"How many sides does a hexagon have?",a:["Five","Six","Seven","Eight"],c:1},
+ {q:"Which is the largest ocean?",a:["Atlantic","Indian","Arctic","Pacific"],c:3},
+ {q:"Which planet is known as the Red Planet?",a:["Venus","Mars","Saturn","Mercury"],c:1},
+ {q:"What is the chemical symbol for gold?",a:["Ag","Au","Go","Gd"],c:1},
+ {q:"Which animal is called the Ship of the Desert?",a:["Horse","Elephant","Camel","Donkey"],c:2},
+ {q:"How many players are there in a cricket team?",a:["9","10","11","12"],c:2},
+ {q:"Which is the smallest prime number?",a:["0","1","2","3"],c:2},
+ {q:"Which part of a plant absorbs water?",a:["Leaf","Flower","Stem","Root"],c:3},
+ {q:"What is the national animal of India?",a:["Lion","Bengal Tiger","Elephant","Peacock"],c:1},
+ {q:"Which instrument is used to measure temperature?",a:["Barometer","Thermometer","Speedometer","Ammeter"],c:1},
+ {q:"How many minutes are there in one hour?",a:["30","45","60","90"],c:2},
+ {q:"Which is the nearest star to Earth?",a:["Sirius","Sun","Proxima Centauri","Polaris"],c:1},
+ {q:"Which country is famous for the pyramids of Giza?",a:["India","Egypt","Greece","Mexico"],c:1},
+ {q:"What is the boiling point of water at sea level?",a:["50°C","75°C","100°C","150°C"],c:2},
+ {q:"Which blood cells help fight infections?",a:["Red blood cells","White blood cells","Platelets","Plasma"],c:1},
+ {q:"Which is the largest mammal?",a:["Elephant","Blue whale","Giraffe","Hippopotamus"],c:1},
+ {q:"Which festival is known as the Festival of Lights?",a:["Holi","Pongal","Diwali","Eid"],c:2},
+ {q:"How many bones are there in an adult human body?",a:["106","206","306","406"],c:1},
+ {q:"Which is the hardest natural substance?",a:["Iron","Gold","Diamond","Quartz"],c:2},
+ {q:"Which language is primarily used to style web pages?",a:["HTML","CSS","SQL","Python"],c:1},
+ {q:"What does CPU stand for?",a:["Central Processing Unit","Computer Personal Unit","Central Program Utility","Control Processing User"],c:0},
+ {q:"Which device is used to input text into a computer?",a:["Monitor","Printer","Keyboard","Speaker"],c:2},
+ {q:"Which is the largest continent?",a:["Africa","Europe","Asia","Australia"],c:2},
+ {q:"Which vitamin is produced in the skin with sunlight?",a:["Vitamin A","Vitamin B12","Vitamin C","Vitamin D"],c:3},
+ {q:"What is the square root of 144?",a:["10","11","12","14"],c:2},
+ {q:"Which ocean lies between Africa and Australia?",a:["Pacific","Indian","Atlantic","Arctic"],c:1},
+ {q:"Which bird is the symbol of peace?",a:["Eagle","Crow","Dove","Parrot"],c:2},
+ {q:"Which metal is liquid at room temperature?",a:["Copper","Mercury","Aluminium","Silver"],c:1},
+ {q:"What is the main source of energy for Earth?",a:["Moon","Sun","Wind","Coal"],c:1},
+ {q:"Which country gifted the Statue of Liberty to the USA?",a:["France","Germany","Italy","Canada"],c:0},
+ {q:"How many degrees are in a right angle?",a:["45","60","90","180"],c:2},
+ {q:"Which is the longest river in India?",a:["Yamuna","Ganga","Godavari","Narmada"],c:1},
+ {q:"Which is the largest internal organ in the human body?",a:["Heart","Liver","Lung","Kidney"],c:1},
+ {q:"What is H2O commonly known as?",a:["Salt","Oxygen","Water","Hydrogen"],c:2},
+ {q:"Which planet has prominent rings?",a:["Earth","Saturn","Mars","Mercury"],c:1},
+ {q:"Which sport uses a shuttlecock?",a:["Tennis","Badminton","Hockey","Football"],c:1},
+ {q:"Which is the national flower of India?",a:["Rose","Sunflower","Lotus","Jasmine"],c:2},
+ {q:"What is the first month of the year?",a:["March","January","June","December"],c:1},
+ {q:"Which sense organ helps us hear?",a:["Eyes","Nose","Ears","Skin"],c:2},
+ {q:"Which computer component is known as its brain?",a:["RAM","CPU","Mouse","Hard disk"],c:1},
+ {q:"What is the freezing point of water?",a:["0°C","10°C","32°C","100°C"],c:0},
+ {q:"Which country is home to the Great Wall?",a:["Japan","China","Thailand","Nepal"],c:1},
+ {q:"Which is the largest hot desert in the world?",a:["Gobi","Sahara","Thar","Kalahari"],c:1},
+ {q:"Which gas do humans need to breathe?",a:["Carbon dioxide","Oxygen","Helium","Methane"],c:1},
+ {q:"How many days are there in a leap year?",a:["364","365","366","367"],c:2},
+ {q:"Which shape has three sides?",a:["Square","Triangle","Pentagon","Circle"],c:1},
+ {q:"Which is the national bird of India?",a:["Sparrow","Peacock","Parrot","Eagle"],c:1},
+ {q:"Which instrument measures atmospheric pressure?",a:["Thermometer","Barometer","Compass","Ruler"],c:1},
+ {q:"Which part of the computer displays visual output?",a:["Keyboard","Monitor","Mouse","Microphone"],c:1},
+ {q:"What is the opposite of evaporation?",a:["Melting","Condensation","Boiling","Freezing"],c:1},
+ {q:"Which is the closest planet to the Sun?",a:["Venus","Earth","Mercury","Mars"],c:2},
+ {q:"Which Indian city is known as the Pink City?",a:["Mumbai","Jaipur","Chennai","Kolkata"],c:1},
+ {q:"How many letters are there in the English alphabet?",a:["24","25","26","27"],c:2}
+];
+
+let humanScore=0;
+let robotScore=0;
+let currentIndex=0;
+let roundQuestions=[];
+let answered=false;
+let humanName=localStorage.getItem("playerName") || "CONTESTANT";
+const USED_KEY="bigboss_level5_used_questions";
+
+function shuffle(arr){
+  return [...arr].sort(()=>Math.random()-0.5);
+}
+
+function startGame(){
+  let used=[];
+  try{
+    used=JSON.parse(localStorage.getItem(USED_KEY)) || [];
+  }catch(e){used=[];}
+
+  const freshQuestions=questions.filter(item=>!used.includes(item.q));
+
+  if(freshQuestions.length<10){
+    alert("All unique questions have been played! No repeated questions allowed.");
+    return;
+  }
+
+  roundQuestions=shuffle(freshQuestions).slice(0,10);
+
+  // Save selected questions so they cannot repeat in another game.
+  used.push(...roundQuestions.map(item=>item.q));
+  localStorage.setItem(USED_KEY,JSON.stringify([...new Set(used)]));
+
+  humanScore=0;
+  robotScore=0;
+  currentIndex=0;
+  answered=false;
+
+  document.getElementById("intro").classList.add("hidden");
+  document.getElementById("celebration").classList.add("hidden");
+  document.getElementById("game").classList.remove("hidden");
+
+  document.getElementById("humanName").textContent=humanName;
+  updateScores();
+  showQuestion();
+}
+
+function updateScores(){
+  document.getElementById("humanScore").textContent=humanScore;
+  document.getElementById("robotScore").textContent=robotScore;
+}
+
+function showQuestion(){
+  answered=false;
+  const item=roundQuestions[currentIndex];
+
+  document.getElementById("questionCount").textContent=
+    "QUESTION "+(currentIndex+1)+" / 10";
+  document.getElementById("question").textContent=item.q;
+  document.getElementById("feedback").textContent="";
+  document.getElementById("robotStatus").textContent="🤖 ROBO-X is waiting...";
+  document.getElementById("nextBtn").classList.add("hidden");
+
+  const box=document.getElementById("options");
+  box.innerHTML="";
+
+  item.a.forEach((answer,index)=>{
+    const btn=document.createElement("button");
+    btn.className="option";
+    btn.textContent=String.fromCharCode(65+index)+". "+answer;
+    btn.onclick=()=>chooseAnswer(index,btn);
+    box.appendChild(btn);
+  });
+}
+
+function chooseAnswer(index,chosenButton){
+  if(answered)return;
+  answered=true;
+
+  const item=roundQuestions[currentIndex];
+  const buttons=document.querySelectorAll(".option");
+
+  buttons.forEach((btn,i)=>{
+    btn.disabled=true;
+    if(i===item.c)btn.classList.add("correct");
+  });
+
+  if(index===item.c){
+    humanScore+=100;
+    document.getElementById("feedback").textContent="🎉 Correct! You earned 100 points!";
+  }else{
+    chosenButton.classList.add("wrong");
+    document.getElementById("feedback").textContent=
+      "Not quite! Correct answer: "+item.a[item.c];
+  }
+
+  updateScores();
+  document.getElementById("robotStatus").textContent="🤖 ROBO-X is thinking...";
+  setTimeout(robotAnswer,1300);
+}
+
+function robotAnswer(){
+  const item=roundQuestions[currentIndex];
+  let robotChoice;
+
+  // ROBO-X has an 80% chance of choosing the correct answer.
+  if(Math.random()<0.8){
+    robotChoice=item.c;
+  }else{
+    const wrongChoices=item.a.map((_,i)=>i).filter(i=>i!==item.c);
+    robotChoice=wrongChoices[Math.floor(Math.random()*wrongChoices.length)];
+  }
+
+  if(robotChoice===item.c){
+    robotScore+=100;
+    document.getElementById("robotStatus").textContent="🤖 ROBO-X answered correctly! +100 points";
+  }else{
+    document.getElementById("robotStatus").textContent="🤖 ROBO-X gave a wrong answer!";
+  }
+
+  updateScores();
+
+  const next=document.getElementById("nextBtn");
+  next.textContent=currentIndex===9?"VIEW FINAL RESULT":"NEXT QUESTION ➜";
+  next.classList.remove("hidden");
+}
+
+function nextQuestion(){
+  currentIndex++;
+  if(currentIndex>=10){
+    finishGame();
+  }else{
+    showQuestion();
+  }
+}
+
+function finishGame(){
+  document.getElementById("game").classList.add("hidden");
+  showGrandCelebration();
+}
+
+function showGrandCelebration(){
+  const celebration=document.getElementById("celebration");
+  celebration.classList.remove("hidden");
+
+  document.getElementById("finalHuman").textContent=humanScore;
+  document.getElementById("finalRobot").textContent=robotScore;
+
+  if(humanScore>robotScore){
+    document.getElementById("winnerTitle").textContent="👑 HUMAN CHAMPION! 👑";
+    document.getElementById("winnerName").textContent=humanName+" WINS!";
+    document.getElementById("winnerMessage").textContent=
+      "Amazing victory! You defeated ROBO-X and won the Bigg Boss Grand Finale!";
+  }else if(robotScore>humanScore){
+    document.getElementById("winnerTitle").textContent="🤖 ROBO-X IS THE CHAMPION!";
+    document.getElementById("winnerName").textContent="ROBO-X WINS!";
+    document.getElementById("winnerMessage").textContent=
+      "ROBO-X wins the final battle! What a brilliant competition!";
+  }else{
+    document.getElementById("winnerTitle").textContent="🤝 BOTH ARE CHAMPIONS!";
+    document.getElementById("winnerName").textContent="IT'S A GRAND TIE!";
+    document.getElementById("winnerMessage").textContent=
+      "An unforgettable battle! Both contestants share the championship!";
+  }
+
+  createConfetti();
+}
+
+function createConfetti(){
+  const area=document.getElementById("confettiArea");
+  area.innerHTML="";
+  const decorations=["🎉","✨","🎊","⭐","💜","🏆","🥳"];
+
+  for(let i=0;i<35;i++){
+    const item=document.createElement("span");
+    item.className="confetti";
+    item.textContent=decorations[Math.floor(Math.random()*decorations.length)];
+    item.style.left=Math.random()*100+"%";
+    item.style.animationDelay=Math.random()*3+"s";
+    item.style.animationDuration=(3+Math.random()*3)+"s";
+    area.appendChild(item);
+  }
+}
+
+function goHome(){
+  window.location.href="index.html";
+}
+</script>
+</body>
+</html>

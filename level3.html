@@ -1,0 +1,456 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bigg Boss | Level 3</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 25px 15px;
+    font-family: Arial, sans-serif;
+    color: white;
+    text-align: center;
+    background: radial-gradient(circle at top, #512080, #170b29 65%, #080510);
+}
+
+.container {
+    max-width: 650px;
+    margin: auto;
+    padding: 30px 22px;
+    border: 2px solid #d6a7ff;
+    border-radius: 22px;
+    background: rgba(20, 8, 37, 0.94);
+    box-shadow: 0 0 25px #9b42e8;
+}
+
+h1 {
+    color: #ffd76a;
+    font-size: 32px;
+}
+
+.subtitle {
+    color: #e0c9ff;
+}
+
+.info {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 25px 0;
+}
+
+.info div {
+    background: #351653;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 1px solid #b77aff;
+}
+
+#scrambled {
+    font-size: 38px;
+    letter-spacing: 8px;
+    color: #ffd76a;
+    margin: 30px 0;
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+.hint {
+    background: #29113f;
+    border: 1px dashed #d6a7ff;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 20px 0;
+    color: #ffffff;
+    font-size: 17px;
+}
+
+input {
+    width: 90%;
+    max-width: 350px;
+    padding: 14px;
+    border-radius: 10px;
+    border: 2px solid #c58aff;
+    outline: none;
+    font-size: 18px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+button {
+    padding: 13px 25px;
+    margin: 10px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(45deg, #e6b94d, #ffdf83);
+    color: #24102e;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    transform: scale(1.04);
+}
+
+#message {
+    min-height: 28px;
+    font-weight: bold;
+    margin: 15px;
+}
+
+#gameArea, #resultArea {
+    display: none;
+}
+
+#timer {
+    color: #ff8585;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+#resultArea h2 {
+    color: #ffd76a;
+    font-size: 30px;
+}
+
+.next {
+    background: linear-gradient(45deg, #a84cff, #e3a5ff);
+    color: white;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>👑 BIGG BOSS HOUSE 👑</h1>
+    <h2>LEVEL 3 - WORD MASTER</h2>
+    <p class="subtitle">Unscramble the word and prove your intelligence!</p>
+
+    <div class="info">
+        <div>ROUND: 1 / 1</div>
+        <div>QUESTION: <span id="questionNo">0</span> / 10</div>
+        <div>SCORE: <span id="score">0</span></div>
+    </div>
+
+    <div id="startArea">
+        <h2>🧠 WORD CHALLENGE</h2>
+        <p>Find the correct word using the scrambled letters and hint.</p>
+        <p>⏳ 30 seconds for each word</p>
+        <p>⭐ 100 points for every correct answer</p>
+        <button onclick="startGame()">START CHALLENGE</button>
+    </div>
+
+    <div id="gameArea">
+
+        <p id="timer">⏳ Time: 30 seconds</p>
+
+        <h2>Unscramble This Word</h2>
+
+        <div id="scrambled"></div>
+
+        <div class="hint">
+            💡 <b>HINT:</b><br><br>
+            <span id="hintText"></span>
+        </div>
+
+        <input
+            type="text"
+            id="answer"
+            placeholder="Enter your answer"
+            autocomplete="off"
+        >
+
+        <br>
+
+        <button onclick="checkAnswer()">SUBMIT ANSWER</button>
+
+        <p id="message"></p>
+
+    </div>
+
+    <div id="resultArea">
+        <h2>🎉 CHALLENGE COMPLETED! 🎉</h2>
+        <h3>Your Final Score</h3>
+        <h1 id="finalScore">0 / 1000</h1>
+        <p id="finalMessage"></p>
+
+        <button class="next" onclick="goNext()">
+            NEXT LEVEL 4 ➜
+        </button>
+    </div>
+
+</div>
+
+<script>
+
+const wordBank = [
+    {word:"APPLE", hint:"A red or green fruit."},
+    {word:"TIGER", hint:"A wild animal with black stripes."},
+    {word:"SCHOOL", hint:"A place where students study."},
+    {word:"COMPUTER", hint:"A device used for coding and browsing."},
+    {word:"ELEPHANT", hint:"A huge animal with a long trunk."},
+    {word:"DOCTOR", hint:"A person who treats sick people."},
+    {word:"RAINBOW", hint:"You can see this after rain."},
+    {word:"GARDEN", hint:"A place where flowers and plants grow."},
+    {word:"KEYBOARD", hint:"We use this to type on a computer."},
+    {word:"BUTTERFLY", hint:"A colourful insect with beautiful wings."},
+    {word:"MOBILE", hint:"A device used to call people."},
+    {word:"LIBRARY", hint:"A place where you can borrow books."},
+    {word:"PYTHON", hint:"A popular programming language."},
+    {word:"CRICKET", hint:"A sport played with a bat and ball."},
+    {word:"ORANGE", hint:"A citrus fruit with a bright colour."},
+    {word:"MONKEY", hint:"An animal that loves climbing trees."},
+    {word:"TEACHER", hint:"A person who teaches students."},
+    {word:"PLANET", hint:"Earth is one of these."},
+    {word:"ROCKET", hint:"A vehicle that travels into space."},
+    {word:"MOUNTAIN", hint:"A very high natural landform."},
+    {word:"HOSPITAL", hint:"A place where patients receive treatment."},
+    {word:"NOTEBOOK", hint:"A book used for writing notes."},
+    {word:"DIAMOND", hint:"A very precious and hard gemstone."},
+    {word:"DOLPHIN", hint:"An intelligent sea animal."},
+    {word:"AIRPORT", hint:"A place where aeroplanes take off."},
+    {word:"CHOCOLATE", hint:"A sweet treat made from cocoa."},
+    {word:"TELEPHONE", hint:"A device used to communicate with others."},
+    {word:"UNIVERSE", hint:"Everything that exists in space."},
+    {word:"CAMERA", hint:"A device used to take photographs."},
+    {word:"BICYCLE", hint:"A two-wheeled vehicle with pedals."},
+    {word:"KITCHEN", hint:"A place where food is prepared."},
+    {word:"SUNFLOWER", hint:"A yellow flower that follows sunlight."},
+    {word:"LAPTOP", hint:"A portable personal computer."},
+    {word:"JUNGLE", hint:"A place filled with many wild animals and trees."},
+    {word:"PENGUIN", hint:"A black and white bird that cannot fly."},
+    {word:"RAINCOAT", hint:"Clothing worn to stay dry in rain."},
+    {word:"FOOTBALL", hint:"A sport played by kicking a ball."},
+    {word:"KEYCHAIN", hint:"A small item used to hold keys."},
+    {word:"WATERFALL", hint:"Water falling from a height."},
+    {word:"FESTIVAL", hint:"A special celebration or occasion."},
+    {word:"MIRROR", hint:"You can see your reflection in this."},
+    {word:"AIRPLANE", hint:"A vehicle that flies in the sky."},
+    {word:"GUITAR", hint:"A musical instrument with strings."},
+    {word:"PENCIL", hint:"An object used for writing and drawing."},
+    {word:"CASTLE", hint:"A large old building where kings lived."},
+    {word:"ASTRONAUT", hint:"A person trained to travel into space."},
+    {word:"WHATSAPP", hint:"A popular messaging application."},
+    {word:"INTERNET", hint:"A worldwide network connecting computers."},
+    {word:"VOLCANO", hint:"A mountain that can release hot lava."},
+    {word:"BUTTER", hint:"A dairy product often spread on bread."}
+];
+
+let questions = [];
+let currentIndex = 0;
+let score = 0;
+let timeLeft = 30;
+let timerInterval;
+let answered = false;
+
+function shuffle(array) {
+    return [...array].sort(() => Math.random() - 0.5);
+}
+
+function scrambleWord(word) {
+    let letters = word.split("");
+    let scrambled = word;
+
+    while (scrambled === word) {
+        letters = shuffle(letters);
+        scrambled = letters.join("");
+    }
+
+    return scrambled;
+}
+
+function startGame() {
+
+    const usedWords = JSON.parse(
+        localStorage.getItem("bigboss_level3_used_words") || "[]"
+    );
+
+    const availableWords = wordBank.filter(
+        item => !usedWords.includes(item.word)
+    );
+
+    if (availableWords.length < 10) {
+        alert("All available words are completed!");
+        return;
+    }
+
+    questions = shuffle(availableWords).slice(0, 10);
+
+    const updatedUsedWords = [
+        ...usedWords,
+        ...questions.map(item => item.word)
+    ];
+
+    localStorage.setItem(
+        "bigboss_level3_used_words",
+        JSON.stringify(updatedUsedWords)
+    );
+
+    document.getElementById("startArea").style.display = "none";
+    document.getElementById("gameArea").style.display = "block";
+
+    currentIndex = 0;
+    score = 0;
+
+    document.getElementById("score").textContent = score;
+
+    showQuestion();
+}
+
+function showQuestion() {
+
+    if (currentIndex >= questions.length) {
+        finishGame();
+        return;
+    }
+
+    answered = false;
+    timeLeft = 30;
+
+    const question = questions[currentIndex];
+
+    document.getElementById("questionNo").textContent =
+        currentIndex + 1;
+
+    document.getElementById("scrambled").textContent =
+        scrambleWord(question.word);
+
+    document.getElementById("hintText").textContent =
+        question.hint;
+
+    document.getElementById("answer").value = "";
+    document.getElementById("message").textContent = "";
+
+    document.getElementById("timer").textContent =
+        "⏳ Time: 30 seconds";
+
+    document.getElementById("answer").focus();
+
+    clearInterval(timerInterval);
+
+    timerInterval = setInterval(() => {
+
+        timeLeft--;
+
+        document.getElementById("timer").textContent =
+            "⏳ Time: " + timeLeft + " seconds";
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+
+            if (!answered) {
+                answered = true;
+
+                document.getElementById("message").textContent =
+                    "⏰ Time's up! Answer: " + question.word;
+
+                document.getElementById("message").style.color =
+                    "#ff8585";
+
+                setTimeout(nextQuestion, 1500);
+            }
+        }
+
+    }, 1000);
+}
+
+function checkAnswer() {
+
+    if (answered) return;
+
+    const userAnswer = document
+        .getElementById("answer")
+        .value
+        .trim()
+        .toUpperCase();
+
+    if (userAnswer === "") {
+        document.getElementById("message").textContent =
+            "Please enter your answer!";
+        return;
+    }
+
+    answered = true;
+    clearInterval(timerInterval);
+
+    const correctWord = questions[currentIndex].word;
+
+    if (userAnswer === correctWord) {
+
+        score += 100;
+
+        document.getElementById("message").textContent =
+            "🎉 Correct Answer! +100 Points";
+
+        document.getElementById("message").style.color =
+            "#7dffab";
+
+    } else {
+
+        document.getElementById("message").textContent =
+            "❌ Wrong! Correct answer: " + correctWord;
+
+        document.getElementById("message").style.color =
+            "#ff8585";
+    }
+
+    document.getElementById("score").textContent = score;
+
+    setTimeout(nextQuestion, 1500);
+}
+
+function nextQuestion() {
+    currentIndex++;
+    showQuestion();
+}
+
+function finishGame() {
+
+    clearInterval(timerInterval);
+
+    document.getElementById("gameArea").style.display = "none";
+    document.getElementById("resultArea").style.display = "block";
+
+    document.getElementById("finalScore").textContent =
+        score + " / 1000";
+
+    let message = "";
+
+    if (score >= 800) {
+        message = "👑 Excellent! You are a Word Master!";
+    } else if (score >= 500) {
+        message = "🔥 Great job! You did well!";
+    } else {
+        message = "👏 Challenge completed! Keep moving forward!";
+    }
+
+    document.getElementById("finalMessage").textContent = message;
+}
+
+function goNext() {
+    window.location.href = "level4.html";
+}
+
+document.getElementById("answer").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        checkAnswer();
+    }
+});
+
+</script>
+
+</body>
+</html>

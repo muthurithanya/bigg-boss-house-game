@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Big Boss - Level 2</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+ margin:0;
+ min-height:100vh;
+ padding:25px 15px;
+ background:radial-gradient(circle at top,#652c91,#150923);
+ color:white;
+ font-family:Arial,sans-serif;
+ text-align:center;
+}
+
+.container{max-width:550px;margin:auto}
+
+h1{color:#ffd86b;font-size:32px}
+
+.subtitle{color:#dcbaff;letter-spacing:2px}
+
+.info{
+ display:flex;
+ justify-content:center;
+ gap:15px;
+ margin:25px 0;
+}
+
+.stat{
+ background:#ffffff15;
+ border:1px solid #c58aff;
+ border-radius:14px;
+ padding:15px 25px;
+ min-width:120px;
+}
+
+.stat strong{
+ display:block;
+ color:#ffd86b;
+ font-size:27px;
+ margin-top:8px;
+}
+
+#board{
+ display:grid;
+ grid-template-columns:repeat(4,1fr);
+ gap:12px;
+ margin:25px auto;
+ max-width:420px;
+}
+
+.card{
+ aspect-ratio:1;
+ border:1px solid #d9aaff;
+ border-radius:15px;
+ background:linear-gradient(145deg,#853bb2,#42176c);
+ color:white;
+ font-size:30px;
+ cursor:pointer;
+ box-shadow:0 5px 15px #0005;
+ transition:transform .2s;
+}
+
+.card:hover{transform:scale(1.04)}
+
+.card.open,.card.matched{
+ background:linear-gradient(145deg,#ffd86b,#ffad36);
+ color:#27103e;
+}
+
+.card.matched{
+ opacity:.65;
+ cursor:default;
+}
+
+button.main{
+ padding:14px 30px;
+ border:none;
+ border-radius:30px;
+ background:linear-gradient(90deg,#ffd700,#ffac35);
+ color:#26123b;
+ font-weight:bold;
+ font-size:16px;
+ cursor:pointer;
+}
+
+#complete{
+ display:none;
+ background:#ffffff15;
+ border:1px solid gold;
+ padding:25px;
+ border-radius:20px;
+ margin-top:25px;
+}
+
+#complete h2{color:#ffd86b}
+
+#message{
+ color:#ffe49a;
+ min-height:25px;
+}
+
+@media(max-width:400px){
+ #board{gap:8px}
+ .card{font-size:25px}
+ .stat{padding:12px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>👁️ BIG BOSS HOUSE</h1>
+<p class="subtitle">LEVEL 02 • MEMORY ARENA</p>
+
+<p>Remember the pairs. Beat the clock!</p>
+
+<div class="info">
+ <div class="stat">
+  SCORE
+  <strong id="score">0</strong>
+ </div>
+ <div class="stat">
+  TIME
+  <strong id="time">60</strong>
+ </div>
+</div>
+
+<div id="board"></div>
+
+<p id="message">Press START to begin!</p>
+
+<button class="main" id="start" onclick="startGame()">
+ START CHALLENGE →
+</button>
+
+<div id="complete">
+ <h2>🏆 LEVEL 2 COMPLETE!</h2>
+ <h3>YOU CLEARED MEMORY ARENA!</h3>
+ <p>Your Score: <strong id="finalScore">0</strong></p>
+ <p>🔥 Amazing Performance!</p>
+ <button class="main" onclick="location.href='level3.html'">
+ ENTER LEVEL 3 →
+ </button>
+</div>
+
+</div>
+
+<script>
+
+const symbols=["🦋","🎸","🍉","🧸","🌻","🎮"];
+
+let first=null;
+let second=null;
+let lock=false;
+let matched=0;
+let score=0;
+let time=60;
+let timer=null;
+let active=false;
+
+function startGame(){
+
+ clearInterval(timer);
+
+ first=null;
+ second=null;
+ lock=false;
+ matched=0;
+ score=0;
+ time=60;
+ active=true;
+
+ document.getElementById("score").textContent=0;
+ document.getElementById("time").textContent=60;
+ document.getElementById("message").textContent="Find all 6 matching pairs!";
+ document.getElementById("complete").style.display="none";
+ document.getElementById("start").style.display="none";
+
+ let board=document.getElementById("board");
+ board.style.pointerEvents="auto";
+ board.innerHTML="";
+
+ let cards=[...symbols,...symbols];
+
+ for(let i=cards.length-1;i>0;i--){
+  let j=Math.floor(Math.random()*(i+1));
+  [cards[i],cards[j]]=[cards[j],cards[i]];
+ }
+
+ cards.forEach(symbol=>{
+
+  let card=document.createElement("button");
+
+  card.className="card";
+  card.type="button";
+  card.dataset.symbol=symbol;
+  card.textContent="?";
+
+  card.addEventListener("click",()=>flip(card));
+
+  board.appendChild(card);
+
+ });
+
+ timer=setInterval(()=>{
+
+  time--;
+
+  document.getElementById("time").textContent=time;
+
+  if(time<=0){
+   gameOver();
+  }
+
+ },1000);
+
+}
+
+function flip(card){
+
+ if(!active || lock) return;
+ if(card.classList.contains("open")) return;
+ if(card.classList.contains("matched")) return;
+
+ card.classList.add("open");
+ card.textContent=card.dataset.symbol;
+
+ if(!first){
+  first=card;
+  return;
+ }
+
+ second=card;
+ lock=true;
+
+ if(first.dataset.symbol===second.dataset.symbol){
+
+  first.classList.add("matched");
+  second.classList.add("matched");
+
+  score+=100;
+  matched++;
+
+  document.getElementById("score").textContent=score;
+
+  first=null;
+  second=null;
+  lock=false;
+
+  if(matched===6){
+   winGame();
+  }
+
+ }else{
+
+  setTimeout(()=>{
+
+   first.textContent="?";
+   second.textContent="?";
+
+   first.classList.remove("open");
+   second.classList.remove("open");
+
+   first=null;
+   second=null;
+   lock=false;
+
+  },800);
+
+ }
+
+}
+
+function winGame(){
+
+ active=false;
+ clearInterval(timer);
+
+ document.getElementById("message").textContent=
+ "🎉 ALL PAIRS MATCHED!";
+
+ document.getElementById("board").style.pointerEvents="none";
+
+ document.getElementById("finalScore").textContent=score;
+ document.getElementById("complete").style.display="block";
+
+}
+
+function gameOver(){
+
+ active=false;
+ clearInterval(timer);
+
+ document.getElementById("message").textContent=
+ "⏰ TIME UP! Try again!";
+
+ document.getElementById("board").style.pointerEvents="none";
+ document.getElementById("start").textContent="TRY AGAIN ↻";
+ document.getElementById("start").style.display="inline-block";
+
+}
+
+</script>
+
+</body>
+</html>

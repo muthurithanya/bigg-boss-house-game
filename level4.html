@@ -1,0 +1,860 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Bigg Boss | Level 4</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 25px 15px;
+    font-family: Arial, sans-serif;
+    color: white;
+    text-align: center;
+    background: radial-gradient(circle at top, #67248c, #190c30 65%, #080512);
+}
+
+.container {
+    max-width: 700px;
+    margin: auto;
+}
+
+.brand {
+    color: #e5b9ff;
+    font-size: 19px;
+    letter-spacing: 4px;
+}
+
+h1 {
+    color: #ffd86b;
+    font-size: 34px;
+    text-shadow: 0 0 20px #ffbd35;
+}
+
+.subtitle {
+    color: #d9b9ef;
+    letter-spacing: 2px;
+}
+
+.panel {
+    background: #ffffff12;
+    border: 1px solid #bd83ff;
+    border-radius: 20px;
+    padding: 25px;
+    margin: 22px auto;
+    box-shadow: 0 0 25px #a347ff35;
+}
+
+.info {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.stat {
+    background: #ffffff12;
+    padding: 13px 20px;
+    border-radius: 12px;
+    border: 1px solid #9d65c7;
+    min-width: 110px;
+}
+
+.stat strong {
+    display: block;
+    color: #ffd86b;
+    font-size: 25px;
+    margin-top: 5px;
+}
+
+button {
+    border: none;
+    border-radius: 25px;
+    padding: 14px 25px;
+    margin: 10px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    background: linear-gradient(90deg, #ffd700, #ffb52e);
+    color: #25113a;
+}
+
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.option {
+    display: block;
+    width: 100%;
+    max-width: 480px;
+    margin: 12px auto;
+    padding: 15px;
+    background: #522477;
+    border: 1px solid #bb86e5;
+    color: white;
+    border-radius: 12px;
+    font-size: 16px;
+}
+
+.option:hover:not(:disabled) {
+    background: #8542ae;
+}
+
+.option.correct {
+    background: #187b50;
+    border-color: #65f5a9;
+}
+
+.option.wrong {
+    background: #a62e48;
+    border-color: #ff8299;
+}
+
+.question {
+    font-size: 23px;
+    line-height: 1.5;
+    color: #ffe49a;
+    margin: 25px 0;
+}
+
+#feedback {
+    min-height: 25px;
+    color: #ffe49a;
+    font-weight: bold;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.score {
+    font-size: 42px;
+    color: #ffd86b;
+    font-weight: bold;
+}
+
+.small {
+    color: #cdb5dc;
+    font-size: 13px;
+}
+
+#complete h2 {
+    color: #ffd86b;
+}
+
+#level5Button {
+    font-size: 17px;
+    padding: 17px 30px;
+    background: linear-gradient(90deg, #ffd700, #ff8c00);
+    box-shadow: 0 0 20px #ffbd35;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="brand">👁️ BIG BOSS HOUSE</div>
+
+<h1>GENERAL KNOWLEDGE ARENA</h1>
+
+<p class="subtitle">LEVEL 04 • THE KNOWLEDGE BATTLE</p>
+
+<!-- INTRO -->
+
+<div class="panel" id="intro">
+
+<h2>🧠 WELCOME TO THE GK CHALLENGE</h2>
+
+<p>Think smart. Choose wisely. Become the champion!</p>
+
+<p>⭐ 10 Unique Questions</p>
+<p>⭐ 100 Points Per Correct Answer</p>
+<p>⭐ Random Question Selection</p>
+<p>⭐ No Repeated Questions</p>
+
+<button onclick="startGame()">
+START CHALLENGE →
+</button>
+
+<p id="remaining" class="small"></p>
+
+</div>
+
+<!-- GAME -->
+
+<div class="panel hidden" id="game">
+
+<div class="info">
+
+<div class="stat">
+QUESTION
+<strong id="questionNo">1/10</strong>
+</div>
+
+<div class="stat">
+SCORE
+<strong id="score">0</strong>
+</div>
+
+<div class="stat">
+REMAINING
+<strong id="left">40</strong>
+</div>
+
+</div>
+
+<div class="question" id="question"></div>
+
+<div id="options"></div>
+
+<p id="feedback"></p>
+
+<button id="next" class="hidden" onclick="nextQuestion()">
+NEXT QUESTION →
+</button>
+
+</div>
+
+<!-- COMPLETION -->
+
+<div class="panel hidden" id="complete">
+
+<h2>🏆 LEVEL 4 COMPLETED!</h2>
+
+<p>YOUR FINAL SCORE</p>
+
+<div class="score" id="finalScore">0</div>
+
+<p id="summary"></p>
+
+<h2>🔥 YOU ARE A KNOWLEDGE CHAMPION!</h2>
+
+<p>One final challenge is waiting for you.</p>
+
+<h2>👑 THE GRAND FINALE</h2>
+
+<button id="level5Button" onclick="goToLevel5()">
+ENTER LEVEL 5 GRAND FINALE 👑
+</button>
+
+</div>
+
+<!-- QUESTIONS COMPLETED -->
+
+<div class="panel hidden" id="exhausted">
+
+<h2>🎉 QUESTION BANK COMPLETED!</h2>
+
+<p>You have completed all available unique questions.</p>
+
+<h2>🏆 AMAZING PERFORMANCE!</h2>
+
+<button onclick="goToLevel5()">
+GO TO LEVEL 5 👑
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+// ===================================
+// QUESTION BANK - 40 UNIQUE QUESTIONS
+// ===================================
+
+const questionBank = [
+
+{
+id:1,
+q:"Which is the largest planet in our Solar System?",
+a:["Earth","Jupiter","Mars","Venus"],
+c:1
+},
+
+{
+id:2,
+q:"What is the capital of Japan?",
+a:["Seoul","Beijing","Tokyo","Bangkok"],
+c:2
+},
+
+{
+id:3,
+q:"Which gas do plants absorb during photosynthesis?",
+a:["Oxygen","Carbon dioxide","Nitrogen","Hydrogen"],
+c:1
+},
+
+{
+id:4,
+q:"How many bones are there in an adult human body?",
+a:["206","201","210","196"],
+c:0
+},
+
+{
+id:5,
+q:"Which is the fastest land animal?",
+a:["Lion","Horse","Cheetah","Tiger"],
+c:2
+},
+
+{
+id:6,
+q:"Who wrote the Indian National Anthem?",
+a:["Subramania Bharati","Rabindranath Tagore","Mahatma Gandhi","Bankim Chandra"],
+c:1
+},
+
+{
+id:7,
+q:"Which is the largest ocean in the world?",
+a:["Atlantic","Indian","Arctic","Pacific"],
+c:3
+},
+
+{
+id:8,
+q:"What is the chemical symbol for gold?",
+a:["Ag","Au","Go","Gd"],
+c:1
+},
+
+{
+id:9,
+q:"Which planet is known as the Red Planet?",
+a:["Mars","Saturn","Mercury","Neptune"],
+c:0
+},
+
+{
+id:10,
+q:"How many players are there in a cricket team?",
+a:["9","10","11","12"],
+c:2
+},
+
+{
+id:11,
+q:"Which organ pumps blood throughout the human body?",
+a:["Lungs","Brain","Heart","Kidney"],
+c:2
+},
+
+{
+id:12,
+q:"What is the currency of Japan?",
+a:["Dollar","Yen","Euro","Won"],
+c:1
+},
+
+{
+id:13,
+q:"Which is the smallest continent?",
+a:["Europe","Australia","Africa","South America"],
+c:1
+},
+
+{
+id:14,
+q:"Who invented the telephone?",
+a:["Thomas Edison","Alexander Graham Bell","Newton","Marconi"],
+c:1
+},
+
+{
+id:15,
+q:"Which vitamin is produced through sunlight exposure?",
+a:["Vitamin A","Vitamin B12","Vitamin C","Vitamin D"],
+c:3
+},
+
+{
+id:16,
+q:"What is the hardest natural substance?",
+a:["Iron","Diamond","Quartz","Granite"],
+c:1
+},
+
+{
+id:17,
+q:"Which country is famous for the Eiffel Tower?",
+a:["Italy","France","Germany","Spain"],
+c:1
+},
+
+{
+id:18,
+q:"What is the boiling point of water at sea level?",
+a:["50°C","90°C","100°C","120°C"],
+c:2
+},
+
+{
+id:19,
+q:"Which is the nearest star to Earth?",
+a:["Sirius","Sun","Polaris","Vega"],
+c:1
+},
+
+{
+id:20,
+q:"Which animal is known as the Ship of the Desert?",
+a:["Horse","Elephant","Camel","Donkey"],
+c:2
+},
+
+{
+id:21,
+q:"What is the national animal of India?",
+a:["Lion","Bengal Tiger","Elephant","Peacock"],
+c:1
+},
+
+{
+id:22,
+q:"Which instrument is used to measure temperature?",
+a:["Barometer","Thermometer","Hygrometer","Altimeter"],
+c:1
+},
+
+{
+id:23,
+q:"How many sides does a hexagon have?",
+a:["Five","Six","Seven","Eight"],
+c:1
+},
+
+{
+id:24,
+q:"Which is the largest mammal in the world?",
+a:["African Elephant","Giraffe","Blue Whale","Hippopotamus"],
+c:2
+},
+
+{
+id:25,
+q:"Which metal is liquid at room temperature?",
+a:["Copper","Mercury","Aluminium","Iron"],
+c:1
+},
+
+{
+id:26,
+q:"Which is the currency of the United Kingdom?",
+a:["Euro","Dollar","Pound Sterling","Franc"],
+c:2
+},
+
+{
+id:27,
+q:"Which part of a plant absorbs water from soil?",
+a:["Flower","Leaf","Stem","Root"],
+c:3
+},
+
+{
+id:28,
+q:"Which is the first element in the periodic table?",
+a:["Helium","Oxygen","Hydrogen","Carbon"],
+c:2
+},
+
+{
+id:29,
+q:"Which country gifted the Statue of Liberty to the USA?",
+a:["Germany","France","Canada","Italy"],
+c:1
+},
+
+{
+id:30,
+q:"How many colours are traditionally listed in a rainbow?",
+a:["Five","Six","Seven","Eight"],
+c:2
+},
+
+{
+id:31,
+q:"Which is the largest hot desert in the world?",
+a:["Gobi","Sahara","Thar","Kalahari"],
+c:1
+},
+
+{
+id:32,
+q:"Which device measures atmospheric pressure?",
+a:["Thermometer","Barometer","Speedometer","Voltmeter"],
+c:1
+},
+
+{
+id:33,
+q:"Which blood cells help fight infections?",
+a:["Red blood cells","White blood cells","Platelets","Plasma"],
+c:1
+},
+
+{
+id:34,
+q:"Which is the national flower of India?",
+a:["Rose","Sunflower","Lotus","Jasmine"],
+c:2
+},
+
+{
+id:35,
+q:"Which language is used to structure web pages?",
+a:["HTML","SQL","Python","Java"],
+c:0
+},
+
+{
+id:36,
+q:"Which is the largest internal organ in the human body?",
+a:["Heart","Liver","Brain","Kidney"],
+c:1
+},
+
+{
+id:37,
+q:"Which planet is famous for its prominent rings?",
+a:["Earth","Mars","Saturn","Mercury"],
+c:2
+},
+
+{
+id:38,
+q:"What is the square root of 144?",
+a:["10","11","12","14"],
+c:2
+},
+
+{
+id:39,
+q:"Which Indian city is known as the Pink City?",
+a:["Mumbai","Jaipur","Chennai","Kolkata"],
+c:1
+},
+
+{
+id:40,
+q:"Which force pulls objects towards Earth?",
+a:["Magnetism","Friction","Gravity","Electricity"],
+c:2
+}
+
+];
+
+// ===================================
+// GAME VARIABLES
+// ===================================
+
+const STORAGE_KEY = "bigboss_level4_gk_used";
+
+let roundQuestions = [];
+let current = 0;
+let score = 0;
+let answered = false;
+
+// ===================================
+// STORAGE
+// ===================================
+
+function getUsedQuestions() {
+
+    try {
+
+        const data = JSON.parse(
+            localStorage.getItem(STORAGE_KEY) || "[]"
+        );
+
+        if (!Array.isArray(data)) return [];
+
+        return data.filter(id =>
+            questionBank.some(q => q.id === id)
+        );
+
+    } catch(error) {
+
+        return [];
+
+    }
+
+}
+
+function saveUsedQuestions(ids) {
+
+    const used = getUsedQuestions();
+
+    ids.forEach(id => {
+
+        if (!used.includes(id)) {
+            used.push(id);
+        }
+
+    });
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(used)
+    );
+
+}
+
+function getUnusedQuestions() {
+
+    const used = getUsedQuestions();
+
+    return questionBank.filter(q =>
+        !used.includes(q.id)
+    );
+
+}
+
+// ===================================
+// SHUFFLE
+// ===================================
+
+function shuffle(array) {
+
+    const copy = [...array];
+
+    for (let i = copy.length - 1; i > 0; i--) {
+
+        const j = Math.floor(Math.random() * (i + 1));
+
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+
+    }
+
+    return copy;
+
+}
+
+// ===================================
+// START GAME
+// ===================================
+
+function startGame() {
+
+    const unused = getUnusedQuestions();
+
+    if (unused.length === 0) {
+
+        document.getElementById("intro").classList.add("hidden");
+
+        document.getElementById("exhausted").classList.remove("hidden");
+
+        return;
+
+    }
+
+    roundQuestions = shuffle(unused).slice(0, 10);
+
+    saveUsedQuestions(
+        roundQuestions.map(q => q.id)
+    );
+
+    current = 0;
+    score = 0;
+    answered = false;
+
+    document.getElementById("intro").classList.add("hidden");
+
+    document.getElementById("complete").classList.add("hidden");
+
+    document.getElementById("game").classList.remove("hidden");
+
+    showQuestion();
+
+}
+
+// ===================================
+// SHOW QUESTION
+// ===================================
+
+function showQuestion() {
+
+    answered = false;
+
+    const q = roundQuestions[current];
+
+    document.getElementById("questionNo").textContent =
+        (current + 1) + "/" + roundQuestions.length;
+
+    document.getElementById("score").textContent = score;
+
+    document.getElementById("left").textContent =
+        getUnusedQuestions().length;
+
+    document.getElementById("question").textContent = q.q;
+
+    document.getElementById("feedback").textContent = "";
+
+    const next = document.getElementById("next");
+
+    next.classList.add("hidden");
+
+    next.textContent = "NEXT QUESTION →";
+
+    const box = document.getElementById("options");
+
+    box.innerHTML = "";
+
+    q.a.forEach((answer, index) => {
+
+        const btn = document.createElement("button");
+
+        btn.className = "option";
+
+        btn.textContent =
+            String.fromCharCode(65 + index) + ". " + answer;
+
+        btn.onclick = function() {
+            checkAnswer(index, btn);
+        };
+
+        box.appendChild(btn);
+
+    });
+
+}
+
+// ===================================
+// CHECK ANSWER
+// ===================================
+
+function checkAnswer(selected, button) {
+
+    if (answered) return;
+
+    answered = true;
+
+    const q = roundQuestions[current];
+
+    const buttons = document.querySelectorAll(".option");
+
+    buttons.forEach((btn, index) => {
+
+        btn.disabled = true;
+
+        if (index === q.c) {
+            btn.classList.add("correct");
+        }
+
+    });
+
+    if (selected === q.c) {
+
+        score += 100;
+
+        document.getElementById("feedback").textContent =
+            "🎉 CORRECT ANSWER! +100 POINTS";
+
+    } else {
+
+        button.classList.add("wrong");
+
+        document.getElementById("feedback").textContent =
+            "❌ WRONG! Correct Answer: " + q.a[q.c];
+
+    }
+
+    document.getElementById("score").textContent = score;
+
+    const next = document.getElementById("next");
+
+    next.classList.remove("hidden");
+
+    if (current === roundQuestions.length - 1) {
+
+        next.textContent = "FINISH LEVEL 4 🏆";
+
+    }
+
+}
+
+// ===================================
+// NEXT QUESTION
+// ===================================
+
+function nextQuestion() {
+
+    if (!answered) return;
+
+    current++;
+
+    if (current < roundQuestions.length) {
+
+        showQuestion();
+
+    } else {
+
+        finishGame();
+
+    }
+
+}
+
+// ===================================
+// FINISH GAME
+// ===================================
+
+function finishGame() {
+
+    document.getElementById("game").classList.add("hidden");
+
+    document.getElementById("complete").classList.remove("hidden");
+
+    document.getElementById("finalScore").textContent =
+        score + " / " + (roundQuestions.length * 100);
+
+    document.getElementById("summary").textContent =
+        "You completed " + roundQuestions.length +
+        " unique questions and earned " + score + " points!";
+
+}
+
+// ===================================
+// LEVEL 5
+// ===================================
+
+function goToLevel5() {
+
+    window.location.href = "level5.html";
+
+}
+
+// ===================================
+// INITIAL DISPLAY
+// ===================================
+
+function updateRemaining() {
+
+    const remaining = getUnusedQuestions().length;
+
+    document.getElementById("remaining").textContent =
+        remaining + " unique questions available.";
+
+}
+
+updateRemaining();
+
+</script>
+
+</body>
+</html>
